@@ -1,391 +1,276 @@
 
+import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
-
 public class JogoDaVelha extends javax.swing.JFrame {
 
-    private boolean jogadorX = true;  // Alterna entre o jogador X e O
-    private final JButton[][] botoes = new JButton[3][3];  // Para armazenar os botões do tabuleiro
-    private JLabel statusJogo;  // Para exibir o status do jogo (quem venceu ou empate)
+	private static final Color COLOR_WINNER = new java.awt.Color(120, 255, 120);
+	private static final Color COLOR_BOX = new java.awt.Color(255, 255, 255);
+	private boolean jogadorX = true; // Alterna entre o jogador X e O
+	private final JButton[] botoes = new JButton[9]; // Para armazenar os botões do tabuleiro
+	private JLabel statusJogo; // Para exibir o status do jogo (quem venceu ou empate)
+	private boolean endGame;
+	// Variables declaration - do not modify//GEN-BEGIN:variables
+	
+	private JButton botaoReiniciar;
+	private JLabel jLabel1;
+	private javax.swing.JPanel jPanel2;
+	// End of variables declaration//GEN-END:variables
 
-    public JogoDaVelha() {
-        initComponents();
-        
-        statusJogo = new JLabel("Boa Sorte");
-        
-        // Armazenar os botões no array 2D
-        botoes[0][0] = botao1;
-        botoes[0][1] = botao2;
-        botoes[0][2] = botao3;
-        botoes[1][0] = botao4;
-        botoes[1][1] = botao5;
-        botoes[1][2] = botao6;
-        botoes[2][0] = botao7;
-        botoes[2][1] = botao8;
-        botoes[2][2] = botao9;
-        
-    }
-    
-    
-    // função verificarVencedor()
-    private void verificarVencedor() {
-    // Verifica linhas
-    for (int i = 0; i < 3; i++) {
-        if (botoes[i][0].getText().equals(botoes[i][1].getText()) &&
-            botoes[i][1].getText().equals(botoes[i][2].getText()) &&
-            !botoes[i][0].getText().equals("")) {
-            declararVencedor(botoes[i][0].getText());
-            return;
-        }
-    }
+	public JogoDaVelha() {
+		
 
-    // Verifica colunas
-    for (int i = 0; i < 3; i++) {
-        if (botoes[0][i].getText().equals(botoes[1][i].getText()) &&
-            botoes[1][i].getText().equals(botoes[2][i].getText()) &&
-            !botoes[0][i].getText().equals("")) {
-            declararVencedor(botoes[0][i].getText());
-            return;
-        }
-    }
+		statusJogo = new JLabel("Boa Sorte");		
+		
+		for (int i = 0; i < botoes.length; i++) {
+			
+			JButton atual = new JButton();
+			atual.setBackground(COLOR_BOX);
+			atual.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
+			atual.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					if (atual.getText().equals("") && !endGame) { // Verifica se o botão está vazio
+						atual.setText(jogadorX ? "X" : "O");
+						jogadorX = !jogadorX; // Alterna o jogador
+						verificarVencedor(); // Verifica se há um vencedor
+					}
+				}
+			});
+			botoes[i] = atual;
+			
+		}
+		
+		initComponents();
 
-    // Verifica diagonais
-    if (botoes[0][0].getText().equals(botoes[1][1].getText()) &&
-        botoes[1][1].getText().equals(botoes[2][2].getText()) &&
-        !botoes[0][0].getText().equals("")) {
-        declararVencedor(botoes[0][0].getText());
-        return;
-    }
-    if (botoes[0][2].getText().equals(botoes[1][1].getText()) &&
-        botoes[1][1].getText().equals(botoes[2][0].getText()) &&
-        !botoes[0][2].getText().equals("")) {
-        declararVencedor(botoes[0][2].getText());
-        return;
-    }
+	}
+	
+	private String verificaLinha(int a,int b, int c) {
+		boolean vazios = botoes[a].getText().isEmpty() || botoes[b].getText().isEmpty() || botoes[c].getText().isEmpty();
+		boolean ab = botoes[a].getText().equals(botoes[b].getText());
+		boolean bc = botoes[b].getText().equals(botoes[c].getText());
+		if(!vazios && ab && bc) {
+			botoes[a].setBackground(COLOR_WINNER);
+			botoes[b].setBackground(COLOR_WINNER);
+			botoes[c].setBackground(COLOR_WINNER);
+			
+			botoes[a].revalidate();
+			botoes[b].revalidate();
+			botoes[c].revalidate();
+			
+			botoes[a].repaint();
+			botoes[b].repaint();
+			botoes[c].repaint();
+			
+			return botoes[a].getText();
+		}
+		return null;
+	}
 
-    // Verifica se houve empate (tabuleiro cheio)
-    boolean empate = true;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            if (botoes[i][j].getText().equals("")) {
-                empate = false;
-                break;
-            }
-        }
-    }
-    
-    if (empate) {
-        statusJogo.setText("Empate!");
-        desativarTabuleiro();
-    }
-}
-    
-    //Função para Declarar o Vencedor
-    private void declararVencedor(String jogador) {
-    statusJogo.setText("Jogador " + jogador + " venceu!");
-    desativarTabuleiro();  // Desativa o tabuleiro após a vitória
-}
+	// função verificarVencedor()
+	private void verificarVencedor() {
+		
+		// Verifica linhas		
+		declararVencedor(verificaLinha(0, 1, 2));
+		declararVencedor(verificaLinha(3, 4, 5));
+		declararVencedor(verificaLinha(6, 7, 8));
 
-    
-    //Função para Desativar o Tabuleiro
-    private void desativarTabuleiro() {
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            botoes[i][j].setEnabled(false);  // Desativa todos os botões
-        }
-    }
-}
-    // Função para ação dos botões
-private void botaoActionPerformed(java.awt.event.ActionEvent evt, JButton botao) {
-    if (botao.getText().equals("")) {  // Verifica se o botão está vazio
-            botao.setText(jogadorX ? "X" : "O");
-            jogadorX = !jogadorX;  // Alterna o jogador
-            verificarVencedor();  // Verifica se há um vencedor
-        }
-}
+		// Verifica colunas
+		declararVencedor(verificaLinha(0, 3, 6));
+		declararVencedor(verificaLinha(1, 4, 7));
+		declararVencedor(verificaLinha(2, 5, 8));
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+		// Verifica diagonais
+		declararVencedor(verificaLinha(0, 4, 8));
+		declararVencedor(verificaLinha(2, 4, 6));
 
-        jLabel1 = new javax.swing.JLabel();
-        botaoReiniciar = new javax.swing.JButton();
-        jPanel2 = new javax.swing.JPanel();
-        botao1 = new javax.swing.JButton();
-        botao2 = new javax.swing.JButton();
-        botao3 = new javax.swing.JButton();
-        botao4 = new javax.swing.JButton();
-        botao5 = new javax.swing.JButton();
-        botao6 = new javax.swing.JButton();
-        botao7 = new javax.swing.JButton();
-        botao8 = new javax.swing.JButton();
-        botao9 = new javax.swing.JButton();
+		// Verifica se houve empate (tabuleiro cheio)
+		boolean empate = true;
+		for (int i = 0; i < botoes.length; i++) {
+			if (botoes[i].getText().equals("")) {
+				empate = false;
+				break;
+			}
+		}
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("JOGO DA VELHA");
+		if (empate) {
+			statusJogo.setText("Empate!");
+			fimDeJogo();
+		}
+	}
 
-        jLabel1.setText("Jogador  X  Começa ");
+	// Função para Declarar o Vencedor
+	private void declararVencedor(String jogador) {
+		if(jogador != null) {
+			statusJogo.setText("Jogador " + jogador + " venceu!");
+			fimDeJogo(); // Desativa o tabuleiro após a vitória
+		}
+	}
 
-        botaoReiniciar.setBackground(new java.awt.Color(0, 153, 51));
-        botaoReiniciar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        botaoReiniciar.setText("Reiniciar");
-        botaoReiniciar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botaoReiniciarActionPerformed(evt);
-            }
-        });
+	// Função para Desativar o Tabuleiro
+	private void fimDeJogo() {
+		endGame = true;
+	}
 
-        jPanel2.setLayout(new java.awt.GridLayout(3, 3));
+	
 
-        botao1.setBackground(new java.awt.Color(255, 255, 255));
-        botao1.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao1ActionPerformed(evt);
-            }
-        });
+	/**
+	 * This method is called from within the constructor to initialize the form.
+	 * WARNING: Do NOT modify this code. The content of this method is always
+	 * regenerated by the Form Editor.
+	 */
+	@SuppressWarnings("unchecked")
 
-        botao2.setBackground(new java.awt.Color(255, 255, 255));
-        botao2.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao2ActionPerformed(evt);
-            }
-        });
+	// <editor-fold defaultstate="collapsed" desc="Generated
+	// Code">//GEN-BEGIN:initComponents
+	private void initComponents() {
 
-        botao3.setBackground(new java.awt.Color(255, 255, 255));
-        botao3.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao3ActionPerformed(evt);
-            }
-        });
+		jLabel1 = new JLabel();
+		botaoReiniciar = new JButton();
+		jPanel2 = new javax.swing.JPanel();
+		
 
-        botao4.setBackground(new java.awt.Color(255, 255, 255));
-        botao4.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao4ActionPerformed(evt);
-            }
-        });
+		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+		setTitle("JOGO DA VELHA");
 
-        botao5.setBackground(new java.awt.Color(255, 255, 255));
-        botao5.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao5ActionPerformed(evt);
-            }
-        });
+		jLabel1.setText("Jogador  X  Começa ");
 
-        botao6.setBackground(new java.awt.Color(255, 255, 255));
-        botao6.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao6ActionPerformed(evt);
-            }
-        });
+		botaoReiniciar.setBackground(new java.awt.Color(0, 153, 51));
+		botaoReiniciar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+		botaoReiniciar.setText("Reiniciar");
+		botaoReiniciar.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(java.awt.event.ActionEvent evt) {
+				botaoReiniciarActionPerformed(evt);
+			}
+		});
 
-        botao7.setBackground(new java.awt.Color(255, 255, 255));
-        botao7.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao7ActionPerformed(evt);
-            }
-        });
+		jPanel2.setLayout(new java.awt.GridLayout(3, 3));
 
-        botao8.setBackground(new java.awt.Color(255, 255, 255));
-        botao8.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao8ActionPerformed(evt);
-            }
-        });
+		
 
-        botao9.setBackground(new java.awt.Color(255, 255, 255));
-        botao9.setFont(new java.awt.Font("Segoe UI", 1, 24)); // NOI18N
-        botao9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                botao9ActionPerformed(evt);
-            }
-        });
+		GroupLayout layout = new GroupLayout(getContentPane());
+		getContentPane().setLayout(layout);
+		layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+				.addGroup(layout.createSequentialGroup().addContainerGap()
+						.addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE)
+						.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+								Short.MAX_VALUE)
+						.addComponent(botaoReiniciar, GroupLayout.PREFERRED_SIZE, 163, GroupLayout.PREFERRED_SIZE)
+						.addGap(28, 28, 28))
+				.addComponent(jPanel2, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addGroup(layout.createSequentialGroup()
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+								.addComponent(botoes[0], GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+								.addComponent(botoes[3], GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+										Short.MAX_VALUE)
+								.addComponent(botoes[6], GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE,
+										Short.MAX_VALUE))
+						.addGap(1, 1, 1)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+								.addComponent(botoes[4], GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(botoes[1], GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(botoes[7], GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+						.addGap(1, 1, 1)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+								.addComponent(botoes[5], GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(botoes[2], GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE,
+										GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+								.addComponent(botoes[8], GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
+						.addGap(0, 0, Short.MAX_VALUE)));
+		layout.setVerticalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING).addGroup(layout
+				.createSequentialGroup()
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+						.addComponent(jLabel1, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE).addComponent(
+								botaoReiniciar, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				.addComponent(jPanel2, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+				.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE,
+						Short.MAX_VALUE)
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+						.addComponent(botoes[2], GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+								.addComponent(botoes[0], GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)
+								.addComponent(botoes[1], GroupLayout.PREFERRED_SIZE, 77, GroupLayout.PREFERRED_SIZE)))
+				.addGap(1, 1, 1)
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+						.addComponent(botoes[3], GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(botoes[4], GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(botoes[5], GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE))
+				.addGap(1, 1, 1)
+				.addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+						.addComponent(botoes[6], GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(botoes[7], GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(botoes[8], GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE))));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(botaoReiniciar, javax.swing.GroupLayout.PREFERRED_SIZE, 163, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(28, 28, 28))
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(botao1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
-                    .addComponent(botao4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(1, 1, 1)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(botao5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao8, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
-                .addGap(1, 1, 1)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(botao6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao9, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE))
-                .addGap(0, 0, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(botaoReiniciar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(botao3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(botao1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(botao2, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(1, 1, 1)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(botao4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao6, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE))
-                .addGap(1, 1, 1)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(botao7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(botao9, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)))
-        );
+		pack();
+	}// </editor-fold>//GEN-END:initComponents
 
-        pack();
-    }// </editor-fold>//GEN-END:initComponents
-    
-    private void botao9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao9ActionPerformed
-        
-   botaoActionPerformed(evt, botao9);
-        
-    }//GEN-LAST:event_botao9ActionPerformed
+	
 
-    private void botaoReiniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botaoReiniciarActionPerformed
-        
-       for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            botoes[i][j].setText("");  // Limpa o texto dos botões
-            botoes[i][j].setEnabled(true);  // Reativa todos os botões
-        }
-    }
-    statusJogo.setText("Jogador X começa");  // Reseta o status
-    jogadorX = true;  // Reinicia com o jogador X
+	private void botaoReiniciarActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_botaoReiniciarActionPerformed
 
-        
-    }//GEN-LAST:event_botaoReiniciarActionPerformed
+		for (int i = 0; i < botoes.length; i++) {
+			botoes[i].setText(""); // Limpa o texto dos botões
+			botoes[i].setBackground(COLOR_BOX);
+		}
+		statusJogo.setText("Jogador X começa"); // Reseta o status
+		jogadorX = true; // Reinicia com o jogador X
+		endGame = false;
 
-    private void botao1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao1ActionPerformed
-    
-        botaoActionPerformed(evt, botao1);
-     
-    }//GEN-LAST:event_botao1ActionPerformed
+	}// GEN-LAST:event_botaoReiniciarActionPerformed
 
-    private void botao2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao2ActionPerformed
-        
-     botaoActionPerformed(evt, botao2);
-    }//GEN-LAST:event_botao2ActionPerformed
+	
+	/**
+	 * @param args the command line arguments
+	 */
+	public static void main(String args[]) {
+		/* Set the Nimbus look and feel */
+		// <editor-fold defaultstate="collapsed" desc=" Look and feel setting code
+		// (optional) ">
+		/*
+		 * If Nimbus (introduced in Java SE 6) is not available, stay with the default
+		 * look and feel. For details see
+		 * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
+		 */
+		try {
+			for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+				if ("Nimbus".equals(info.getName())) {
+					javax.swing.UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (ClassNotFoundException ex) {
+			java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null,
+					ex);
+		} catch (InstantiationException ex) {
+			java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null,
+					ex);
+		} catch (IllegalAccessException ex) {
+			java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null,
+					ex);
+		} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+			java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null,
+					ex);
+		}
+		// </editor-fold>
 
-    private void botao3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao3ActionPerformed
-        
-   botaoActionPerformed(evt, botao3);
+		/* Create and display the form */
+		java.awt.EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new JogoDaVelha().setVisible(true);
+			}
+		});
+	}
 
-        
-    }//GEN-LAST:event_botao3ActionPerformed
-
-    private void botao4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao4ActionPerformed
-        
-     botaoActionPerformed(evt, botao4);    
-    }//GEN-LAST:event_botao4ActionPerformed
-
-    private void botao5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao5ActionPerformed
-        
-   botaoActionPerformed(evt, botao5);
-        
-    }//GEN-LAST:event_botao5ActionPerformed
-
-    private void botao6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao6ActionPerformed
-        
-    botaoActionPerformed(evt, botao6); 
-    }//GEN-LAST:event_botao6ActionPerformed
-
-    private void botao7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao7ActionPerformed
-        
-   botaoActionPerformed(evt, botao7);  
-    }//GEN-LAST:event_botao7ActionPerformed
-
-    private void botao8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botao8ActionPerformed
-        
-   botaoActionPerformed(evt, botao8);
-        
-    }//GEN-LAST:event_botao8ActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(JogoDaVelha.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new JogoDaVelha().setVisible(true);
-            }
-        });
-    }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton botao1;
-    private javax.swing.JButton botao2;
-    private javax.swing.JButton botao3;
-    private javax.swing.JButton botao4;
-    private javax.swing.JButton botao5;
-    private javax.swing.JButton botao6;
-    private javax.swing.JButton botao7;
-    private javax.swing.JButton botao8;
-    private javax.swing.JButton botao9;
-    private javax.swing.JButton botaoReiniciar;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel2;
-    // End of variables declaration//GEN-END:variables
+	
 }
