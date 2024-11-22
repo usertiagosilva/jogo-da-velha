@@ -6,7 +6,7 @@ Este é um projeto de Jogo da Velha (Tic-Tac-Toe) desenvolvido em Java usando a 
 
 Criar um jogo de Jogo da Velha (Tic-Tac-Toe) jogável entre dois jogadores em um tabuleiro 3x3, alternando as jogadas para tentar formar uma linha de três símbolos e assim vencer o jogo.
 
-## ✨ Funcionalidades
+## ✨ Funcionalidades 1
 
 - **Jogada dos Jogadores:** Permite que dois jogadores façam suas jogadas alternadamente no tabuleiro.
 - **Verificação de Vencedor:** Verifica automaticamente se algum jogador venceu ou se houve um empate após cada jogada.
